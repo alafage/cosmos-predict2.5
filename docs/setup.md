@@ -32,47 +32,6 @@ cd <repository_name>
 git lfs pull
 ```
 
-Install one of the following environments:
-
-<details id="virtual-environment"><summary><b>Virtual Environment</b></summary>
-
-Install system dependencies:
-
-```shell
-sudo apt update && sudo apt -y install curl ffmpeg libx11-dev tree wget
-```
-
-* [uv](https://docs.astral.sh/uv/getting-started/installation/)
-
-```shell
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
-```
-
-Install the package into a new environment:
-
-```shell
-uv python install
-uv sync --extra=cu128
-source .venv/bin/activate
-```
-
-Or, install the package into the active environment (e.g. conda):
-
-```shell
-uv sync --extra=cu128 --active --inexact
-```
-
-CUDA Variants:
-
-| CUDA Version | Arguments | Notes |
-| --- | --- | --- |
-| CUDA 12.8 | `--extra cu128` | [NVIDIA Driver](https://docs.nvidia.com/cuda/archive/12.8.1/cuda-toolkit-release-notes/index.html#cuda-toolkit-major-component-versions) |
-| CUDA 13.0 | `--extra cu130` | [NVIDIA Driver](https://docs.nvidia.com/cuda/archive/13.0.0/cuda-toolkit-release-notes/index.html#cuda-toolkit-major-component-versions) |
-
-For DGX Spark and Jetson AGX, you must use CUDA 13.0.
-</details>
-
 <details id="docker-container"><summary><b>Docker Container</b></summary>
 
 Please make sure you have access to Docker on your machine and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) is installed.
@@ -81,15 +40,13 @@ Build the container:
 
 ```bash
 # Ampere - Hopper
-image_tag=$(docker build -f Dockerfile -q .)
-# Blackwell
-image_tag=$(docker build -f docker/nightly.Dockerfile -q .)
+image_tag=$(sudo docker build -f Dockerfile -q .)
 ```
 
 Run the container:
 
 ```bash
-docker run -it --runtime=nvidia --ipc=host --rm -v .:/workspace -v /workspace/.venv -v /root/.cache:/root/.cache -e HF_TOKEN="$HF_TOKEN" $image_tag
+sudo docker run -it --runtime=nvidia --ipc=host --rm -v .:/workspace -v /workspace/.venv -v /root/.cache:/root/.cache -e HF_TOKEN="$HF_TOKEN" -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility --gpus 'all,"capabilities=compute,video,utility"' $image_tag
 ```
 
 Optional arguments:
@@ -108,6 +65,8 @@ sudo systemctl restart docker
 </details>
 
 ## Downloading Checkpoints
+
+Inside the container:
 
 1. Get a [Hugging Face Access Token](https://huggingface.co/settings/tokens) with `Read` permission
 2. Install [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli): `uv tool install -U "huggingface_hub[cli]"`

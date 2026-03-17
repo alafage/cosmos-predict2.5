@@ -23,6 +23,13 @@ FROM ${BASE_IMAGE}
 # Set the DEBIAN_FRONTEND environment variable to avoid interactive prompts during apt operations.
 ENV DEBIAN_FRONTEND=noninteractive
 
+ARG http_proxy
+ARG https_proxy
+
+# Set the evironment variable for the proxy
+ENV http_proxy http://<NAME>:<PWD>@<ADDR>:<PORT>/
+ENV https_proxy http://<NAME>:<PWD>@<ADDR>:<PORT>/
+
 # Install packages
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt \
@@ -48,8 +55,10 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash 
 
 WORKDIR /workspace
 
+RUN echo "http_proxy=$http_proxy" && echo "https_proxy=$https_proxy"
+
 # Install the project's dependencies using the lockfile and settings
-ARG CUDA_NAME=cu128
+ARG CUDA_NAME=cu130
 ENV CUDA_NAME=${CUDA_NAME}
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
