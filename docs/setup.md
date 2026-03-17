@@ -40,6 +40,8 @@ git lfs pull
 
 ### Docker Container
 
+*The following procedure assumes that the [post-installation procedure for docker](https://docs.docker.com/engine/install/linux-postinstall/) has been done*
+
 Please make sure you have access to Docker on your machine and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) is installed.
 
 Build the container:
