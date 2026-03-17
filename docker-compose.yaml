@@ -6,3 +6,18 @@ services:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
+    ipc: host
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+      NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility"
+    
+    volumes:
+      - .:/workspace
+      - /workspace/.venv:/workspace/.venv
+      - /root/.cache:/root/.cache

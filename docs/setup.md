@@ -32,7 +32,13 @@ cd <repository_name>
 git lfs pull
 ```
 
-<details id="docker-container"><summary><b>Docker Container</b></summary>
+### HuggingFace Token
+
+1. Get a [Hugging Face Access Token](https://huggingface.co/settings/tokens) with `Read` permission.
+2. Add to your `.bashrc`: `export HF_TOKEN=<TOKEN>`.
+3. Accept the [NVIDIA Open Model License Agreement](https://huggingface.co/nvidia/Cosmos-Guardrail1).
+
+### Docker Container
 
 Please make sure you have access to Docker on your machine and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) is installed.
 
@@ -40,20 +46,14 @@ Build the container:
 
 ```bash
 # Ampere - Hopper
-image_tag=$(sudo docker build -f Dockerfile -q .)
+docker compose build
 ```
 
 Run the container:
 
 ```bash
-sudo docker run -it --runtime=nvidia --ipc=host --rm -v .:/workspace -v /workspace/.venv -v /root/.cache:/root/.cache -e HF_TOKEN="$HF_TOKEN" -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility --gpus 'all,"capabilities=compute,video,utility"' $image_tag
+docker compose run --rm app
 ```
-
-Optional arguments:
-
-* `--ipc=host`: Use host system's shared memory, since parallel torchrun consumes a large amount of shared memory. If not allowed by security policy, increase `--shm-size` ([documentation](https://docs.docker.com/engine/containers/run/#runtime-constraints-on-resources)).
-* `-v /root/.cache:/root/.cache`: Mount host cache to avoid re-downloading cache entries.
-* `-e HF_TOKEN="$HF_TOKEN"`: Set Hugging Face token to avoid re-authenticating.
 
 If you get `docker: Error response from daemon: unknown or invalid runtime name: nvidia`, you need to [configure docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker):
 
@@ -62,15 +62,11 @@ sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
 ```
 
-</details>
-
 ## Downloading Checkpoints
 
 Inside the container:
 
-1. Get a [Hugging Face Access Token](https://huggingface.co/settings/tokens) with `Read` permission
-2. Install [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli): `uv tool install -U "huggingface_hub[cli]"`
-3. Login: `hf auth login`
-4. Accept the [NVIDIA Open Model License Agreement](https://huggingface.co/nvidia/Cosmos-Guardrail1).
+1. Install [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli): `uv tool install -U "huggingface_hub[cli]"`
+
 
 Checkpoints are automatically downloaded during inference and post-training. To modify the checkpoint cache location, set the [`HF_HOME`](https://huggingface.co/docs/huggingface_hub/en/package_reference/environment_variables#hfhome) environment variable.

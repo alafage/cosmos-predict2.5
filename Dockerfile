@@ -27,8 +27,8 @@ ARG http_proxy
 ARG https_proxy
 
 # Set the evironment variable for the proxy
-ENV http_proxy http://<NAME>:<PWD>@<ADDR>:<PORT>/
-ENV https_proxy http://<NAME>:<PWD>@<ADDR>:<PORT>/
+ENV http_proxy $http_proxy
+ENV https_proxy $https_proxy
 
 # Install packages
 RUN --mount=type=cache,target=/var/cache/apt \
